@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who's That Pokémon?</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Who's That Pokémon?</h1>
+        </header>
+
+        <main>
+            <div class="pokemon-display">
+                <div id="pokemon-image" class="silhouette">
+                    <img id="pokemon-img" src="" alt="Pokémon silhouette">
+                </div>
+            </div>
+
+            <div id="answer-section" class="answer-section">
+                <div class="answer-grid">
+                    <button class="answer-btn" data-answer="pikachu">Pikachu</button>
+                    <button class="answer-btn" data-answer="pikachu">Pikachu</button>
+                    <button class="answer-btn" data-answer="pikachu">Pikachu</button>
+                    <button class="answer-btn" data-answer="pikachu">Pikachu</button>
+                </div>
+            </div>
+
+            <div id="result-section" class="result-section hidden">
+                <div class="result-box angry">
+                    <h2 id="result-text"></h2>
+                    <p id="result-subtext"></p>
+                    <button id="next-btn" class="next-btn">Next Pokémon</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>A hilarious prank version 😈</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
