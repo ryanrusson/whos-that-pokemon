@@ -142,7 +142,7 @@ function showAngryResult() {
     const insultText = randomInsult.replace('{name}', currentPokemon.name);
 
     resultText.textContent = insultText;
-    resultSubtext.textContent = "All these choices are Pikachu, and NONE of them are correct!";
+    resultSubtext.textContent = "";
 }
 
 // Reset game for next round
