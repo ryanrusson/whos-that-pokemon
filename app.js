@@ -70,6 +70,7 @@ let currentPokemon = null;
 
 // DOM elements
 const pokemonImg = document.getElementById('pokemon-img');
+const pikachuImg = document.getElementById('pikachu-img');
 const pokemonImage = document.getElementById('pokemon-image');
 const answerSection = document.getElementById('answer-section');
 const resultSection = document.getElementById('result-section');
@@ -80,8 +81,24 @@ const answerButtons = document.querySelectorAll('.answer-btn');
 
 // Initialize game
 function initGame() {
+    loadPikachu();
     loadRandomPokemon();
     setupEventListeners();
+}
+
+// Load Pikachu image once (always shows as silhouette)
+async function loadPikachu() {
+    try {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon/25');
+        const data = await response.json();
+
+        // Use the official artwork for Pikachu
+        const imageUrl = data.sprites.other['official-artwork'].front_default;
+        pikachuImg.src = imageUrl;
+        pikachuImg.alt = 'Pikachu silhouette';
+    } catch (error) {
+        console.error('Error loading Pikachu:', error);
+    }
 }
 
 // Setup event listeners
@@ -105,12 +122,12 @@ async function loadRandomPokemon() {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${currentPokemon.id}`);
         const data = await response.json();
 
-        // Use the official artwork
+        // Use the official artwork for the random Pokemon
         const imageUrl = data.sprites.other['official-artwork'].front_default;
         pokemonImg.src = imageUrl;
-        pokemonImg.alt = `${currentPokemon.name} silhouette`;
+        pokemonImg.alt = currentPokemon.name;
 
-        // Ensure silhouette effect is applied
+        // Ensure silhouette effect is applied and Pokemon layer is hidden
         pokemonImage.classList.remove('revealed');
         pokemonImage.classList.add('silhouette');
     } catch (error) {

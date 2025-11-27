@@ -56,17 +56,44 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
-#pokemon-img {
+#pokemon-img, #pikachu-img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    position: absolute;
+}
+
+/* Pikachu layer - visible during silhouette */
+.pikachu-layer {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    filter: brightness(0) invert(0);
+}
+
+/* Pokemon layer - hidden initially */
+.pokemon-layer {
+    opacity: 0;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+    filter: brightness(0) invert(0);
 }
 
 /* Silhouette effect */
 .silhouette img {
     filter: brightness(0) invert(0);
+}
+
+/* Revealed state - Pikachu fades out, Pokemon fades in */
+.revealed .pikachu-layer {
+    opacity: 0;
+}
+
+.revealed .pokemon-layer {
+    opacity: 1;
+    filter: none !important;
+    animation: reveal 0.5s ease;
 }
 
 .answer-section {
@@ -169,11 +196,6 @@ main {
 .next-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.revealed img {
-    filter: none !important;
-    animation: reveal 0.5s ease;
 }
 
 @keyframes reveal {
