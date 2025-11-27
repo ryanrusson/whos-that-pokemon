@@ -69,7 +69,7 @@ const insultTemplates = [
 let currentPokemon = null;
 let wrongAttempts = 0;
 let conversationHistory = [];
-const VERCEL_API_URL = 'https://whos-that-pokemon-4v093eu7h-ryan-russons-projects.vercel.app/api/insult';
+const VERCEL_API_URL = '/api/insult';
 
 // Rate limiting: cache last insult and timestamp
 let lastInsultCache = null;
@@ -146,7 +146,7 @@ async function loadRandomPokemon() {
 }
 
 // Handle answer click (all answers are wrong since they all say "Pikachu")
-function handleAnswerClick() {
+async function handleAnswerClick() {
     // Reveal the Pokémon
     pokemonImage.classList.remove('silhouette');
     pokemonImage.classList.add('revealed');
@@ -154,20 +154,16 @@ function handleAnswerClick() {
     // Hide answer buttons
     answerSection.style.display = 'none';
 
-    // Show angry result
-    showAngryResult();
+    // Get the insult first, then show result section
+    await showAngryResult();
 
-    // Show result section
+    // Show result section after insult is ready
     resultSection.classList.remove('hidden');
 }
 
 // Show angry result with LLM-generated escalating insult
 async function showAngryResult() {
     wrongAttempts++;
-
-    // Show loading message
-    resultText.textContent = "Thinking of an insult...";
-    resultSubtext.textContent = "";
 
     let insultText = '';
     const now = Date.now();
@@ -181,7 +177,6 @@ async function showAngryResult() {
         const randomInsult = insultTemplates[Math.floor(Math.random() * insultTemplates.length)];
         insultText = randomInsult.replace('{name}', currentPokemon.name);
         resultText.textContent = insultText;
-        resultSubtext.textContent = "";
         return;
     }
 
@@ -227,7 +222,6 @@ async function showAngryResult() {
     }
 
     resultText.textContent = insultText;
-    resultSubtext.textContent = "";
 }
 
 // Reset game for next round

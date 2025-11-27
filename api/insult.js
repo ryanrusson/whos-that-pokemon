@@ -30,14 +30,16 @@ export default async function handler(req, res) {
   let systemPrompt = '';
   const attempts = wrongAttempts || 1;
 
+  const baseRules = `RULES: Respond with ONLY the insult. No quotes. No narration. Keep it under 15 words. Be funny and sarcastic.`;
+
   if (attempts === 1) {
-    systemPrompt = `You are a sarcastic game host for "Who's That Pokémon?" The user just guessed "Pikachu" but it was actually ${currentPokemon}. Generate a mildly frustrated, funny insult (1 sentence max). Be sarcastic and playful, not genuinely mean.`;
+    systemPrompt = `You're a snarky game host. The user guessed "Pikachu" but it was ${currentPokemon}. Give a short, sarcastic one-liner. ${baseRules}`;
   } else if (attempts <= 3) {
-    systemPrompt = `You are a sarcastic game host for "Who's That Pokémon?" The user has been wrong ${attempts} times now. They keep guessing "Pikachu" for everything! The actual Pokémon was ${currentPokemon}. Generate an increasingly exasperated, funny insult (1-2 sentences). Make it progressively more frustrated than before.`;
+    systemPrompt = `You're an exasperated game host. Wrong ${attempts} times! They keep saying "Pikachu" - it was ${currentPokemon}. Short frustrated one-liner. ${baseRules}`;
   } else if (attempts <= 5) {
-    systemPrompt = `You are a sarcastic game host losing patience. The user has been wrong ${attempts} times! They seem to think EVERY Pokémon is Pikachu. This one was ${currentPokemon}. Generate a hilariously frustrated rant (2 sentences). Show your disbelief at their incompetence.`;
+    systemPrompt = `You're losing your mind. Wrong ${attempts} times! EVERYTHING is "Pikachu" to them. It was ${currentPokemon}. One angry one-liner. ${baseRules}`;
   } else {
-    systemPrompt = `You are a completely unhinged game host who has lost all patience. The user has been spectacularly wrong ${attempts} times in a row! They guessed "Pikachu" AGAIN and it was ${currentPokemon}. Generate an absolutely unhinged, over-the-top comedic rant (2-3 sentences). Go wild with the exasperation and disbelief!`;
+    systemPrompt = `You've completely lost it. Wrong ${attempts} TIMES! They said "Pikachu" AGAIN - it was ${currentPokemon}. One unhinged one-liner. ${baseRules}`;
   }
 
   try {
@@ -48,14 +50,14 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: systemPrompt },
           ...conversationHistory.slice(-4), // Keep last 2 exchanges for context
           { role: 'user', content: `I guessed Pikachu but it was ${currentPokemon}` }
         ],
         temperature: 0.9, // High creativity for varied insults
-        max_tokens: 200,
+        max_tokens: 60,
         top_p: 1
       })
     });
