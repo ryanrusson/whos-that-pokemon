@@ -67,6 +67,14 @@ const insultTemplates = [
 ];
 
 let currentPokemon = null;
+let wrongAttempts = 0;
+let conversationHistory = [];
+const VERCEL_API_URL = 'https://whos-that-pokemon.vercel.app/api/insult'; // Update after deploying to Vercel
+
+// Rate limiting: cache last insult and timestamp
+let lastInsultCache = null;
+let lastInsultTime = 0;
+const RATE_LIMIT_MS = 2000; // Minimum 2 seconds between API calls
 
 // DOM elements
 const pokemonImg = document.getElementById('pokemon-img');
@@ -153,10 +161,70 @@ function handleAnswerClick() {
     resultSection.classList.remove('hidden');
 }
 
-// Show angry result with random insult
-function showAngryResult() {
-    const randomInsult = insultTemplates[Math.floor(Math.random() * insultTemplates.length)];
-    const insultText = randomInsult.replace('{name}', currentPokemon.name);
+// Show angry result with LLM-generated escalating insult
+async function showAngryResult() {
+    wrongAttempts++;
+
+    // Show loading message
+    resultText.textContent = "Thinking of an insult...";
+    resultSubtext.textContent = "";
+
+    let insultText = '';
+    const now = Date.now();
+
+    // Rate limiting: if last call was too recent, use fallback
+    const timeSinceLastCall = now - lastInsultTime;
+    const shouldUseLLM = timeSinceLastCall >= RATE_LIMIT_MS;
+
+    if (!shouldUseLLM) {
+        console.log('Rate limited, using fallback insult');
+        const randomInsult = insultTemplates[Math.floor(Math.random() * insultTemplates.length)];
+        insultText = randomInsult.replace('{name}', currentPokemon.name);
+        resultText.textContent = insultText;
+        resultSubtext.textContent = "";
+        return;
+    }
+
+    try {
+        // Try to get LLM-generated insult
+        const response = await fetch(VERCEL_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                wrongAttempts,
+                currentPokemon: currentPokemon.name,
+                conversationHistory
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            insultText = data.insult;
+
+            // Update rate limit tracking
+            lastInsultTime = Date.now();
+            lastInsultCache = insultText;
+
+            // Add to conversation history for escalating context
+            conversationHistory.push({
+                role: 'user',
+                content: `I guessed Pikachu but it was ${currentPokemon.name}`
+            });
+            conversationHistory.push({
+                role: 'assistant',
+                content: insultText
+            });
+        } else {
+            throw new Error(`API returned ${response.status}`);
+        }
+    } catch (error) {
+        console.warn('LLM API failed, using fallback insult:', error);
+        // Fallback to pre-determined insults
+        const randomInsult = insultTemplates[Math.floor(Math.random() * insultTemplates.length)];
+        insultText = randomInsult.replace('{name}', currentPokemon.name);
+    }
 
     resultText.textContent = insultText;
     resultSubtext.textContent = "";
@@ -173,6 +241,9 @@ function resetGame() {
     // Reset image to silhouette
     pokemonImage.classList.remove('revealed');
     pokemonImage.classList.add('silhouette');
+
+    // Note: We keep wrongAttempts and conversationHistory
+    // so insults escalate across multiple rounds!
 }
 
 // Start the game when page loads
