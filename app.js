@@ -69,7 +69,7 @@ const insultTemplates = [
 let currentPokemon = null;
 let wrongAttempts = 0;
 let conversationHistory = [];
-const VERCEL_API_URL = 'https://whos-that-pokemon.vercel.app/api/insult'; // Update after deploying to Vercel
+const VERCEL_API_URL = 'https://whos-that-pokemon-4v093eu7h-ryan-russons-projects.vercel.app/api/insult';
 
 // Rate limiting: cache last insult and timestamp
 let lastInsultCache = null;
